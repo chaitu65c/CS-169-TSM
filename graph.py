@@ -49,12 +49,12 @@ def make_graph(iterable, limit, weight_function):
         graph.add_vertex(x, (uniform(-limit,limit), uniform(-limit,limit)))
     return graph
 
-def generate_graphs(n_cases, limit):
+def generate_graphs(n_cases, limit, weight_function):
     graph_lst = []
     sizes = [50, 100, 200, 500, 1000]
     for _ in range(int(n_cases/len(sizes))):
         for size in sizes:
-            graph_lst.append(make_graph(range(size), limit))
+            graph_lst.append(make_graph(range(size), limit, weight_function))
     return graph_lst
 
 # cases = generate_graphs(20, 180)
