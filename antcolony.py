@@ -11,24 +11,6 @@ from threading import Thread
 class ant_colony:
 	class ant(Thread):
 		def __init__(self, init_location, possible_locations, pheromone_map, distance_callback, alpha, beta, first_pass=False):
-			"""
-			initialized an ant, to traverse the map
-			init_location -> marks where in the map that the ant starts
-			possible_locations -> a list of possible nodes the ant can go to
-				when used internally, gives a list of possible locations the ant can traverse to _minus those nodes already visited_
-			pheromone_map -> map of pheromone values for each traversal between each node
-			distance_callback -> is a function to calculate the distance between two nodes
-			alpha -> a parameter from the ACO algorithm to control the influence of the amount of pheromone when making a choice in _pick_path()
-			beta -> a parameters from ACO that controls the influence of the distance to the next node in _pick_path()
-			first_pass -> if this is a first pass on a map, then do some steps differently, noted in methods below
-			
-			route -> a list that is updated with the labels of the nodes that the ant has traversed
-			pheromone_trail -> a list of pheromone amounts deposited along the ants trail, maps to each traversal in route
-			distance_traveled -> total distance tranveled along the steps in route
-			location -> marks where the ant currently is
-			tour_complete -> flag to indicate the ant has completed its traversal
-				used by get_route() and get_distance_traveled()
-			"""
 			Thread.__init__(self)
 			
 			self.init_location = init_location
@@ -48,16 +30,6 @@ class ant_colony:
 			self.tour_complete = False
 			
 		def run(self):
-			"""
-			until self.possible_locations is empty (the ant has visited all nodes)
-				_pick_path() to find a next node to traverse to
-				_traverse() to:
-					_update_route() (to show latest traversal)
-					_update_distance_traveled() (after traversal)
-			return the ants route and its distance, for use in ant_colony:
-				do pheromone updates
-				check for new possible optimal solution with this ants latest tour
-			"""
 			while self.possible_locations:
 				next = self._pick_path()
 				self._traverse(self.location, next)
@@ -65,12 +37,6 @@ class ant_colony:
 			self.tour_complete = True
 		
 		def _pick_path(self):
-			"""
-			source: https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms#Edge_selection
-			implements the path selection algorithm of ACO
-			calculate the attractiveness of each possible transition from the current location
-			then randomly choose a next path, based on its attractiveness
-			"""
 			#on the first pass (no pheromones), then we can just choice() to find the next one
 			if self.first_pass:
 				import random
@@ -166,55 +132,6 @@ class ant_colony:
 			return None
 		
 	def __init__(self, nodes, distance_callback, start=None, ant_count=50, alpha=.5, beta=1.2,  pheromone_evaporation_coefficient=.40, pheromone_constant=1000.0, iterations=80):
-		"""
-		initializes an ant colony (houses a number of worker ants that will traverse a map to find an optimal route as per ACO [Ant Colony Optimization])
-		source: https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms
-		
-		nodes -> is assumed to be a dict() mapping node ids to values 
-			that are understandable by distance_callback
-			
-		distance_callback -> is assumed to take a pair of coordinates and return the distance between them
-			populated into distance_matrix on each call to get_distance()
-			
-		start -> if set, then is assumed to be the node where all ants start their traversal
-			if unset, then assumed to be the first key of nodes when sorted()
-		
-		distance_matrix -> holds values of distances calculated between nodes
-			populated on demand by _get_distance()
-		
-		pheromone_map -> holds final values of pheromones
-			used by ants to determine traversals
-			pheromone dissipation happens to these values first, before adding pheromone values from the ants during their traversal
-			(in ant_updated_pheromone_map)
-			
-		ant_updated_pheromone_map -> a matrix to hold the pheromone values that the ants lay down
-			not used to dissipate, values from here are added to pheromone_map after dissipation step
-			(reset for each traversal)
-			
-		alpha -> a parameter from the ACO algorithm to control the influence of the amount of pheromone when an ant makes a choice
-		
-		beta -> a parameters from ACO that controls the influence of the distance to the next node in ant choice making
-		
-		pheromone_constant -> a parameter used in depositing pheromones on the map (Q in ACO algorithm)
-			used by _update_pheromone_map()
-			
-		pheromone_evaporation_coefficient -> a parameter used in removing pheromone values from the pheromone_map (rho in ACO algorithm)
-			used by _update_pheromone_map()
-		
-		ants -> holds worker ants
-			they traverse the map as per ACO
-			notable properties:
-				total distance traveled
-				route
-			
-		first_pass -> flags a first pass for the ants, which triggers unique behavior
-		
-		iterations -> how many iterations to let the ants traverse the map
-		
-		shortest_distance -> the shortest distance seen from an ant traversal
-		
-		shortets_path_seen -> the shortest path seen from a traversal (shortest_distance is the distance along this path)
-		"""
 		#nodes
 		if type(nodes) is not dict:
 			raise TypeError("nodes must be dict")
@@ -322,11 +239,6 @@ class ant_colony:
 		return self.distance_matrix[start][end]
 		
 	def _init_nodes(self, nodes):
-		"""
-		create a mapping of internal id numbers (0 .. n) to the keys in the nodes passed 
-		create a mapping of the id's to the values of nodes
-		we use id_to_key to return the route in the node names the caller expects in mainloop()
-		"""
 		id_to_key = dict()
 		id_to_values = dict()
 		
@@ -339,24 +251,12 @@ class ant_colony:
 		return id_to_key, id_to_values
 		
 	def _init_matrix(self, size, value=0.0):
-		"""
-		setup a matrix NxN (where n = size)
-		used in both self.distance_matrix and self.pheromone_map
-		as they require identical matrixes besides which value to initialize to
-		"""
 		ret = []
 		for row in range(size):
 			ret.append([float(value) for x in range(size)])
 		return ret
 	
 	def _init_ants(self, start):
-		"""
-		on first pass:
-			create a number of ant objects
-		on subsequent passes, just call __init__ on each to reset them
-		by default, all ants start at the first node, 0
-		as per problem description: https://www.codeeval.com/open_challenges/90/
-		"""
 		#allocate new ants on the first pass
 		if self.first_pass:
 			return [self.ant(start, self.nodes.keys(), self.pheromone_map, self._get_distance,
@@ -366,13 +266,6 @@ class ant_colony:
 			ant.__init__(start, self.nodes.keys(), self.pheromone_map, self._get_distance, self.alpha, self.beta)
 	
 	def _update_pheromone_map(self):
-		"""
-		1)	Update self.pheromone_map by decaying values contained therein via the ACO algorithm
-		2)	Add pheromone_values from all ants from ant_updated_pheromone_map
-		called by:
-			mainloop()
-			(after all ants have traveresed)
-		"""
 		#always a square matrix
 		for start in range(len(self.pheromone_map)):
 			for end in range(len(self.pheromone_map)):
@@ -387,13 +280,6 @@ class ant_colony:
 				self.pheromone_map[start][end] += self.ant_updated_pheromone_map[start][end]
 	
 	def _populate_ant_updated_pheromone_map(self, ant):
-		"""
-		given an ant, populate ant_updated_pheromone_map with pheromone values according to ACO
-		along the ant's route
-		called from:
-			mainloop()
-			( before _update_pheromone_map() )
-		"""
 		route = ant.get_route()
 		for i in range(len(route)-1):
 			#find the pheromone over the route the ant traversed
@@ -408,14 +294,6 @@ class ant_colony:
 			self.ant_updated_pheromone_map[route[i+1]][route[i]] = current_pheromone_value + new_pheromone_value
 		
 	def mainloop(self):
-		"""
-		Runs the worker ants, collects their returns and updates the pheromone map with pheromone values from workers
-			calls:
-			_update_pheromones()
-			ant.run()
-		runs the simulation self.iterations times
-		"""
-		
 		for _ in range(self.iterations):
 			#start the multi-threaded ants, calls ant.run() in a new thread
 			for ant in self.ants:
