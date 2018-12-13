@@ -67,7 +67,7 @@ if __name__ == '__main__':
         ACOdata[key] = a
         print("Done ant colony")
         
-        #Genetic Algorithm
+        """#Genetic Algorithm
         gat = time.time()
         print('Start GA')
         answer = ga(population=cityList, popSize=100, eliteSize=20, mutationRate=0.015, generations=20)
@@ -76,12 +76,12 @@ if __name__ == '__main__':
         a[1] += get_distance(answer)
         a[2] += 1
         gadata[key] = a
-        print('End GA')
+        print('End GA')"""
             
         #Random
         ra = time.time()
         print('Start Random')
-        answer = random_walks(g.all_vertex_coordinates)
+        answer = random_walks(g.all_vertex_coordinates())
         a = randomdata[key]
         a[0] += time.time()-ra
         a[1] += get_distance(answer)
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         #Greedy
         print('Greedy Start')
         gr = time.time()
-        answer = greedy(g.all_vertex_coordinates, graph.euclidian_distance)
+        answer = greedy(g, graph.euclidian_distance)
         a = greddydata[key]
         a[0] += time.time()-gr
         a[1] += get_distance(answer)

@@ -16,7 +16,7 @@ class CompleteGraph:
             neighbors = {}
             for x in self.vertices.keys():
                 if x != vertex:
-                    neighbors[x]=self.weight_function(vertex, x)
+                    neighbors[x]=self.weight_function(vertex,self.vertices[x])
             self.neighbors[vertex] = neighbors
         return self.neighbors[vertex]
     
