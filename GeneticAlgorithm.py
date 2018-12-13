@@ -201,7 +201,7 @@ for i in range(0,25):
 # 1st no plot, 2nd plot   
 import time
 start = time.time()
-finalpts = geneticAlgorithm(population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+finalpts = geneticAlgorithm(population=cityList, popSize=100, eliteSize=20, mutationRate=0.015, generations=450)
 print("Time Taken: {} seconds".format(time.time() - start))
 print('Final Path: {}'.format(finalpts))
 #geneticAlgorithmPlot(population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
