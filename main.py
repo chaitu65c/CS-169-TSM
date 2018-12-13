@@ -56,6 +56,7 @@ if __name__ == '__main__':
             q[count] = i
             count += 1
             cityList.append(City(x=i[0],y=i[1]))        
+        print("Start ant colony")
         answer = ant_colony(dict(q), graph.euclidian_distance)
         e = answer.mainloop()
         a = ACOdata[key]
@@ -64,7 +65,7 @@ if __name__ == '__main__':
         a[1] += get_distance([q[y] for y in e])
         a[2] += 1
         ACOdata[key] = a
-        
+        print("Done ant colony")
         
         #Genetic Algorithm
         gat = time.time()
