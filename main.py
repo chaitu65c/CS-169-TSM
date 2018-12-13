@@ -18,7 +18,7 @@ import time
 
 def get_distance(stuff):
     dist = 0
-    print(stuff)
+    #print(stuff)
     for i in range(1,len(stuff)):
         dist += graph.euclidian_distance(stuff[i-1],stuff[i])
     return dist
@@ -30,20 +30,20 @@ if __name__ == '__main__':
     gadata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
     randomdata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
     greddydata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-    
+    counter= 1
     print("generating graps")
-    graphs = graph.generate_graphs(100,100,graph.euclidian_distance)
+    graphs = graph.generate_graphs(50,50,graph.euclidian_distance)
     print("Start")
     for g in graphs:
-        length = len(g.all_vertex_coordinates())/50
+        length = len(g.all_vertex_coordinates())/10
         key = 0
         if length == 1:
             key = 0
         elif length == 2:
             key = 1
-        elif length == 4:
+        elif length == 3:
             key = 2
-        elif length  ==10:
+        elif length  ==4:
             key = 3
         else:
             key = 4
@@ -69,24 +69,28 @@ if __name__ == '__main__':
         
         #Genetic Algorithm
         gat = time.time()
-
-        answer = ga(population=cityList, popSize=100, eliteSize=20, mutationRate=0.015, generations=450)
+        print('Start GA')
+        answer = ga(population=cityList, popSize=100, eliteSize=20, mutationRate=0.015, generations=20)
         a = gadata[key]
         a[0] += time.time()-gat
         a[1] += get_distance(answer)
         a[2] += 1
         gadata[key] = a
+        print('End GA')
             
         #Random
         ra = time.time()
+        print('Start Random')
         answer = random_walks(g.all_vertex_coordinates)
         a = randomdata[key]
         a[0] += time.time()-ra
         a[1] += get_distance(answer)
         a[2] += 1
         randomdata[key] = a
+        print('End Random')
         
         #Greedy
+        print('Greedy Start')
         gr = time.time()
         answer = greedy(g.all_vertex_coordinates, graph.euclidian_distance)
         a = greddydata[key]
@@ -94,7 +98,9 @@ if __name__ == '__main__':
         a[1] += get_distance(answer)
         a[2] += 1
         greddydata[key] = a
-        print('Iter done')
+        print('Iter {} done'.format(counter))
+        print('Greedy end')
+        counter += 1
     print('Done')
     total_time1 = [f[0]/f[2] for f in ACOdata]
     total_time2 = [f[0]/f[2] for f in gadata]

@@ -51,7 +51,7 @@ def make_graph(iterable, limit, weight_function):
 
 def generate_graphs(n_cases, limit, weight_function):
     graph_lst = []
-    sizes = [50, 100, 200, 500, 1000]
+    sizes = [10, 20, 30, 40, 50]
     for _ in range(int(n_cases/len(sizes))):
         for size in sizes:
             graph_lst.append(make_graph(range(size), limit, weight_function))
