@@ -11,14 +11,16 @@ from antcolony import ant_colony
 import pandas as pd
 from random_and_greedy import random_walks, greedy
 from GeneticAlgorithm import geneticAlgorithm as ga
+from GeneticAlgorithm import City
 import graph
 from collections import defaultdict
 import time
 
 def get_distance(stuff):
     dist = 0
+    print(stuff)
     for i in range(1,len(stuff)):
-        dist += graph.great_circle_distance(stuff[i-1],stuff[i])
+        dist += graph.euclidian_distance(stuff[i-1],stuff[i])
     return dist
 
 
@@ -30,7 +32,7 @@ if __name__ == '__main__':
     greddydata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
     
     print("generating graps")
-    graphs = graph.generate_graphs(100,100,graph.great_circle_distance)
+    graphs = graph.generate_graphs(100,100,graph.euclidian_distance)
     print("Start")
     for g in graphs:
         length = len(g.all_vertex_coordinates())/50
@@ -47,16 +49,27 @@ if __name__ == '__main__':
             key = 4
         # ant colony
         anttime = time.time()
-        answer = ant_colony(g.all_vertex_coordinates, graph.great_circle_distance)
+        cityList = []
+        q = defaultdict()
+        count = 0
+        for i in g.all_vertex_coordinates():
+            q[count] = i
+            count += 1
+            cityList.append(City(x=i[0],y=i[1]))        
+        answer = ant_colony(dict(q), graph.euclidian_distance)
+        e = answer.mainloop()
         a = ACOdata[key]
+        #print(e)
         a[0] += time.time()-anttime
-        a[1] += get_distance(answer)
+        a[1] += get_distance([q[y] for y in e])
         a[2] += 1
         ACOdata[key] = a
         
+        
         #Genetic Algorithm
         gat = time.time()
-        answer = ga(g.all_vertex_coordinates, graph.great_circle_distance)
+
+        answer = ga(population=cityList, popSize=100, eliteSize=20, mutationRate=0.015, generations=450)
         a = gadata[key]
         a[0] += time.time()-gat
         a[1] += get_distance(answer)
@@ -65,7 +78,7 @@ if __name__ == '__main__':
             
         #Random
         ra = time.time()
-        answer = random_walks(g.all_vertex_coordinates, graph.great_circle_distance)
+        answer = random_walks(g.all_vertex_coordinates)
         a = randomdata[key]
         a[0] += time.time()-ra
         a[1] += get_distance(answer)
@@ -74,12 +87,13 @@ if __name__ == '__main__':
         
         #Greedy
         gr = time.time()
-        answer = greedy(g.all_vertex_coordinates, graph.great_circle_distance)
+        answer = greedy(g.all_vertex_coordinates, graph.euclidian_distance)
         a = greddydata[key]
         a[0] += time.time()-gr
         a[1] += get_distance(answer)
         a[2] += 1
         greddydata[key] = a
+        print('Iter done')
     print('Done')
     total_time1 = [f[0]/f[2] for f in ACOdata]
     total_time2 = [f[0]/f[2] for f in gadata]

@@ -193,7 +193,7 @@ def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generatio
     plt.show()
 
 
-cityList = []
+"""cityList = []
 #update with real coordinates
 for i in range(0,25):
     cityList.append(City(x=int(random.random() * 200), y=int(random.random() * 200)))
@@ -231,4 +231,4 @@ for xy in zip(Xf, Yf):                                     # <--
     ax.annotate('(%s, %s)' % xy, xy=xy, textcoords='data') # <--
 plt.title('Genetic Algorithm TSM')
 plt.grid()
-plt.show()
+plt.show()"""
