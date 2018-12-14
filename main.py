@@ -32,10 +32,13 @@ if __name__ == '__main__':
     greddydata = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
     counter= 1
     print("generating graps")
-    graphs = graph.generate_graphs(50,50,graph.euclidian_distance)
+    graphs = graph.generate_graphs(5,50,graph.great_circle_distance)
+    graphs = [graphs[1]]
     print("Start")
     for g in graphs:
+        print(g.all_vertex_coordinates())
         length = len(g.all_vertex_coordinates())/10
+        graphnodes = g.all_vertex_coordinates()
         key = 0
         if length == 1:
             key = 0
@@ -57,7 +60,7 @@ if __name__ == '__main__':
             count += 1
             cityList.append(City(x=i[0],y=i[1]))        
         print("Start ant colony")
-        answer = ant_colony(dict(q), graph.euclidian_distance)
+        answer = ant_colony(dict(q), graph.great_circle_distance)
         e = answer.mainloop()
         a = ACOdata[key]
         #print(e)
@@ -77,33 +80,101 @@ if __name__ == '__main__':
         a[2] += 1
         gadata[key] = a
         print('End GA')"""
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        allpath = [] #put ordered tuple coordinates here
+        allpath = [graphnodes[i] for i in e]
+        
+        Xf = [int(x[0]) for x in allpath]
+        Yf = [int(y[1]) for y in allpath]
+        print('Entire Path: {}\n'.format(allpath))
+        print('X coord: {}\n'.format(Xf))
+        print('Y coord: {}\n'.format(Yf))
+        
+        plt.plot(Xf,Yf) #most points
+        plt.plot([Xf[-1],Xf[0]], [Yf[-1], Yf[0]]) #last stretch
+        plt.plot(Xf[-1], Yf[-1], 'ro') #end point before finish
+        plt.plot(Xf[0], Yf[0], 'go') #start point
+    
+        for xy in zip(Xf, Yf):                                       # <--
+            ax.annotate('(%s, %s)' % xy, xy=xy, textcoords='data') # <--
+        plt.title('Ant Colony TSM')
+        plt.grid()
+        plt.show()
             
         #Random
         ra = time.time()
         print('Start Random')
-        answer = random_walks(g.all_vertex_coordinates())
+        answerr = random_walks(g.all_vertex_coordinates())
         a = randomdata[key]
         a[0] += time.time()-ra
-        a[1] += get_distance(answer)
+        a[1] += get_distance(answerr)
         a[2] += 1
         randomdata[key] = a
         print('End Random')
         
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        allpath = [] #put ordered tuple coordinates here
+        
+        allpath = []
+        allpath = answerr
+        
+        Xf = [int(x[0]) for x in allpath]
+        Yf = [int(y[1]) for y in allpath]        
+        print('Entire Path: {}\n'.format(allpath))
+        print('X coord: {}\n'.format(Xf))
+        print('Y coord: {}\n'.format(Yf))
+        
+        plt.plot(Xf,Yf) #most points
+        plt.plot([Xf[-1],Xf[0]], [Yf[-1], Yf[0]]) #last stretch
+        plt.plot(Xf[-1], Yf[-1], 'ro') #end point before finish
+        plt.plot(Xf[0], Yf[0], 'go') #start point
+    
+        for xy in zip(Xf, Yf):                                       # <--
+            ax.annotate('(%s, %s)' % xy, xy=xy, textcoords='data') # <--
+        plt.title('Random Walks TSM')
+        plt.grid()
+        plt.show()
+        
         #Greedy
         print('Greedy Start')
         gr = time.time()
-        answer = greedy(g, graph.euclidian_distance)
+        answerg = greedy(g, graph.great_circle_distance)
         a = greddydata[key]
         a[0] += time.time()-gr
-        a[1] += get_distance(answer)
+        a[1] += get_distance(answerg)
         a[2] += 1
         greddydata[key] = a
         print('Iter {} done'.format(counter))
         print('Greedy end')
         counter += 1
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        allpath = [] #put ordered tuple coordinates here
+        
+        allpath = answerg
+        
+        Xf = [int(x[0]) for x in allpath]
+        Yf = [int(y[1]) for y in allpath]
+        print('Entire Path: {}\n'.format(allpath))
+        print('X coord: {}\n'.format(Xf))
+        print('Y coord: {}\n'.format(Yf))
+        
+        plt.plot(Xf,Yf) #most points
+        plt.plot([Xf[-1],Xf[0]], [Yf[-1], Yf[0]]) #last stretch
+        plt.plot(Xf[-1], Yf[-1], 'ro') #end point before finish
+        plt.plot(Xf[0], Yf[0], 'go') #start point
+    
+        for xy in zip(Xf, Yf):                                       # <--
+            ax.annotate('(%s, %s)' % xy, xy=xy, textcoords='data') # <--
+        plt.title('Greedy Algorithm TSM')
+        plt.grid()
+        plt.show()
     print('Done')
     total_time1 = [f[0]/f[2] for f in ACOdata]
-    total_time2 = [f[0]/f[2] for f in gadata]
+    #total_time2 = [f[0]/f[2] for f in gadata]
     total_time3 = [f[0]/f[2] for f in randomdata]
     total_time4 = [f[0]/f[2] for f in greddydata]
     
@@ -119,7 +190,7 @@ if __name__ == '__main__':
     
     
     plt.plot(total_time1, [50,100,200,500,1000], 'go-', label='Ant Colony')
-    plt.plot(total_time2, [50,100,200,500,1000], 'ro-',  label='Genetic Algorithm')
+    #plt.plot(total_time2, [50,100,200,500,1000], 'ro-',  label='Genetic Algorithm')
     plt.plot(total_time3, [50,100,200,500,1000], 'bo-', label='Greedy')
     plt.plot(total_time4, [50,100,200,500,1000], 'mo-',  label='Random Walks')
     plt.axis([0.0, 10.0, 0.0, 30.0])
@@ -131,13 +202,13 @@ if __name__ == '__main__':
     plt.show()
     
     
-    """fig = plt.figure()
+    fig = plt.figure()
     ax = fig.add_subplot(111)
-    allpath = [] #put ordered tuple coordinates here"""
+    allpath = [] #put ordered tuple coordinates here
     
-    #for t in range(len(finalpts)):
-    #    allpath.append(finalpts[t])
-    """
+    for t in range(len(answerr)):
+        allpath.append(answerr[t])
+    
     Xf = [x[0] for x in allpath]
     Yf = [y[1] for y in allpath]
     print('Entire Path: {}\n'.format(allpath))
@@ -153,4 +224,4 @@ if __name__ == '__main__':
         ax.annotate('(%s, %s)' % xy, xy=xy, textcoords='data') # <--
     plt.title('Genetic Algorithm TSM')
     plt.grid()
-    plt.show()"""
+    plt.show()

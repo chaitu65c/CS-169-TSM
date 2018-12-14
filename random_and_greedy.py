@@ -38,22 +38,22 @@ def greedy(g, distance):
     from random import randint
     import operator
     graph = g
-    start_index = randint(0, len(g.all_vertex_coordinates()) - 1)
+    new_g = graph.all_vertex_coordinates()
+    start_index = randint(0, len(new_g) - 1)
     visited = []
     first = []
-    a = graph.all_vertex_coordinates()
-    first_point = a[start_index]
+    first_point = new_g[start_index]
     first.append(first_point)
     visited.append(first_point)
     
-    while len(visited) < len(g.all_vertex_coordinates()):
-        dist_dict = g.neighbor_weights(first_point)
+    while len(visited) < len(new_g):
+        dist_dict = graph.neighbor_weights(first_point)
         dict_list = sorted(dist_dict.items(), key=operator.itemgetter(1))
-        #print(dict_list)
+        
         for i in dict_list:
-            if i not in visited:
-                visited.append(i)
-                first_point = i
+            if i[0] not in visited:
+                visited.append(i[0])
+                first_point = i[0]
                 break
             else:
                 continue
